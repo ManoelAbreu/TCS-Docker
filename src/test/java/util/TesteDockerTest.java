@@ -36,7 +36,8 @@ public class TesteDockerTest extends TestCase {
         int num2 = 10;
 
         int soma = t.somarDoisNumeros(num1, num2);
-        assertEquals(soma, (num1 + num2));
+        assertEquals(soma, (num1 * num2));
+        System.out.println("Teste soma");
     }
 
     public void testMultiplicarDoisNumeros() {
@@ -45,6 +46,8 @@ public class TesteDockerTest extends TestCase {
         
         int mult = t.multiplicarDoisNumeros(num1, num2);
         assertEquals(mult, (num1 * num2));
+        System.out.println("multiplicação");
+
     }
 
 }
