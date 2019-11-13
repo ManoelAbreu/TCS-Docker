@@ -1,0 +1,225 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <meta charset="utf-8"/>
+    <ui:define name="corpo">
+
+        <h1>Cadastro de Pedido</h1>
+        <f:metadata>
+            <o:viewParam name="pedido"/>            
+        </f:metadata>
+
+        <style type="text/css">
+
+
+            .ui-picklist-button-add-all {
+                visibility: hidden !important;
+            }
+
+            .ui-picklist-button-remove-all {
+                visibility: hidden !important;
+            }
+
+        </style>
+
+        <body  background="#{resource['imagens:color.jpg']}" >
+            <h:form id="cabecalhoPedido">
+                <p:messages autoUpdate="true" closable="true"  showSummary="false" showDetail="true"/>
+
+                <p:toolbar style="margin-bottom:20px">
+                    <f:facet name="left">
+                        <p:commandButton value="Salvar" action="#{cadastroPedidoBean.salvarAction()}"/>
+
+                    </f:facet>
+
+                </p:toolbar>
+
+                <h:panelGrid columns="4" style="width: 70%;background-color: white">
+                    <p:outputLabel value="Mesa"/>
+                    <p:selectOneMenu id="mesa" style="width:210px"  value="#{cadastroPedidoBean.pedido.mesa}" required="true" requiredMessage="Selecione uma mesa">
+                        <f:selectItem itemLabel="Selecione uma mesa" noSelectionOption="true" itemValue="#{null}" value="#{null}"/>
+                        <f:selectItems value="#{cadastroPedidoBean.mesas}" var="mesa"
+                                       itemLabel="#{mesa.numero} - #{mesa.ocupacao.descricao}" itemValue="#{mesa}"/>
+                        <p:ajax event="change" update="cabecalhoPedido"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Cliente" id="nomeCliente"/>
+                    <p:inputText value="#{cadastroPedidoBean.pedido.mesa.nomeCliente}" disabled="#{cadastroPedidoBean.pedido.mesa.nomeCliente !=null}" required="true" requiredMessage="Indique o nome do cliente!"/>
+
+                    <p:outputLabel value="Total do pedido"/>
+                    <p:outputLabel value="#{cadastroPedidoBean.pedido.totalPedido}" id="total"> 
+                        <f:convertNumber pattern="R$ #0.00"/>
+                    </p:outputLabel>
+
+                    <p:outputLabel value="Data do pedido"/>
+                    <p:outputLabel value="#{cadastroPedidoBean.pedido.dataPedido}">
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </p:outputLabel>
+                </h:panelGrid>
+            </h:form>
+
+            <h:form id ="formItens">
+                <p:fieldset legend="Itens">
+                    <h:panelGrid columns="6" style="width:50% ">
+
+                        <p:outputLabel value="Produto" />
+
+                        <p:selectOneMenu id="produto" style="width:210px"  value="#{cadastroPedidoBean.itemPedido.produto}" effect="fade" filter="true" filterMatchMode="startsWith" 
+                                         required="true" requiredMessage="Selecione um produto">
+                            <f:selectItem itemLabel="Selecione um produto" noSelectionOption="true"/>
+                            <f:selectItems value="#{cadastroPedidoBean.produtos}" var="produto"
+                                           itemLabel="#{produto.nome}" itemValue="#{produto}"/>
+                            <p:ajax event="change" update="valorUnitTab valorProd formItens:adicionais" listener="#{cadastroPedidoBean.carregaSabores()}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Quantidade"/>
+                        <p:spinner id="basic" value="#{cadastroPedidoBean.itemPedido.quantidade}" min="1">
+                            <p:ajax event="change" update="valorProd"/>
+                        </p:spinner>
+
+                        <p:outputLabel value="Valor unitário" />
+                        <h:outputText value="#{cadastroPedidoBean.itemPedido.produto!=null?cadastroPedidoBean.itemPedido.produto.valor:0.0}" id="valorUnitTab">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputText>
+
+                        <p:outputLabel value=""/>
+                        <p:outputLabel value=""/>
+                        <p:outputLabel value=""/>
+                        <p:outputLabel value=""/>
+
+                        <p:outputLabel value="Valor total"/>
+                        <p:outputLabel value="#{cadastroPedidoBean.valorTotalItem}" id="valorProd">
+                            <f:convertNumber pattern="R$ #0.00"/>   
+                        </p:outputLabel>
+
+                    </h:panelGrid>
+
+                    <p:tabView style="border-radius:10px; margin-top:20px" id="adicionais">
+
+                        <p:tab title="Observações">
+                            <p:inputTextarea value="#{cadastroPedidoBean.itemPedido.observacao}" rows="11" cols="100" counter="display" maxlength="100" counterTemplate="{0} Caracteres restantes." autoResize="false"/>
+                            <br/>
+                            <h:outputText id="display" />
+                        </p:tab>
+
+                        <p:tab title="Sabores/Borda" rendered="#{cadastroPedidoBean.validaSaboresBorda()}">
+
+                            <h:panelGrid rendered="#{cadastroPedidoBean.itemPedido.produto.quantidadeSabor>0?true:false}" style="width:50%" columns="1">
+                                <h3>Escolha até #{cadastroPedidoBean.itemPedido.produto.quantidadeSabor} sabor(es)</h3> 
+                            </h:panelGrid>
+                            <h:panelGrid rendered="#{cadastroPedidoBean.itemPedido.produto.quantidadeSabor>0?true:false}" style="width:50%;float:left" columns="2">
+                                <p:column>
+                                    <p:row>                                     
+                                        <h:outputText value="Sabores"/>
+                                        <p:dataTable id="saboresParaEscolher" value="#{cadastroPedidoBean.saboresList}" var="sabor" scrollable="true" scrollHeight="150" style="width:455px" emptyMessage="Sem Sabores vinculados á mesma categoria!!!">
+                                            <p:column >
+                                                <p:outputLabel value="#{sabor.nome}"/>
+                                            </p:column>
+                                            <p:column  style="width:20px">
+                                                <p:commandButton icon="ui-icon-plus" title="Adicionar"  style="width:20px"
+                                                                 action="#{cadastroPedidoBean.adicionaSaborEscolhido()}" update="formItens:adicionais" >
+                                                    <f:setPropertyActionListener value="#{sabor}"
+                                                                                 target="#{cadastroPedidoBean.saborEscolhido}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:row>
+                                </p:column>
+
+                                <p:column>
+                                    <p:row>
+                                        <h:outputText value="Sabores escolhidos"/>
+                                        <p:dataTable id="saboresEscolhidos" value="#{cadastroPedidoBean.saboresListEscolhidos}" var="sabor" scrollable="true" scrollHeight="150" emptyMessage="Sem sabores escolhidos">
+                                            <p:column>
+                                                <p:outputLabel value="#{sabor.nome}"/>
+                                            </p:column> 
+                                            <p:column style="width:20px">
+                                                <p:commandButton  title="Remover" icon="ui-icon-minusthick" style="width:20px"
+                                                                  action="#{cadastroPedidoBean.removeSaborEscolhido()}" update="formItens:adicionais:saboresEscolhidos">
+                                                    <f:setPropertyActionListener value="#{sabor}"
+                                                                                 target="#{cadastroPedidoBean.saborEscolhido}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:row>
+                                </p:column> 
+                            </h:panelGrid>
+
+                            <h:panelGrid style="float:left; margin-left:10px" rendered="#{cadastroPedidoBean.itemPedido.produto.borda}"> 
+                                <h:outputText value="Borda"/>
+                                <p:selectOneMenu id="borda" style="width:210px"  value="#{cadastroPedidoBean.itemPedido.borda}">
+                                    <f:selectItem itemLabel="Selecione uma borda" noSelectionOption="true"/>
+                                    <f:selectItems value="#{cadastroPedidoBean.bordas}" var="borda"
+                                                   itemLabel="#{borda.nome} - R$ #{borda.preco}" itemValue="#{borda}"/>
+                                    <p:ajax event="change" update="formItens:valorProd"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+
+                        </p:tab>
+                    </p:tabView>
+
+                </p:fieldset> 
+                <p:commandButton value="Adicionar" style="margin: 10px; margin-left: 0" action="#{cadastroPedidoBean.adicionaNaListaItens()}" update="formItens cabecalhoPedido:total tableItens"/>
+            </h:form>
+
+            <h:form id="tableItens">
+                <p:dataTable id="tabelaItens" value="#{cadastroPedidoBean.listaItensPedido}"
+                             var="item" rows="5" paginator="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25,50" paginatorPosition="bottom"
+                             currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                             emptyMessage="Nenhum registro encontrado">
+
+                    <p:column headerText="Nome" style="text-align:center; width:15%;">
+                        <h:outputLabel value="#{item.produto.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Valor unitário" style="text-align:center; width:7%;">
+                        <h:outputLabel value="#{item.produto.valor}">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Quantidade" style="width:5%;text-align: center">
+                        <h:outputLabel value="#{item.quantidade}"/>
+                    </p:column>
+
+                    <p:column headerText="Total do item" style="text-align:center; width:10%;">
+                        <h:outputLabel value="#{item.quantidade*item.produto.valor+item.borda.preco}">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Sabores" style="text-align: center">
+                        <h:outputLabel  value="#{pesquisaPedidoBean.concatSabores(item)}"/>
+                    </p:column>
+
+                    <p:column headerText="Borda" style="width:10%;text-align: center">
+                        <h:outputLabel  value="#{item.borda.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Preço da borda" style="width:10%;text-align: center">
+                        <h:outputLabel  value="#{item.borda.preco}">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputLabel>
+                    </p:column>
+
+                    <p:column style="width:80px">
+
+                        <p:commandButton icon="ui-icon-trash" title="excluir"
+                                         update="tabelaItens cabecalhoPedido:total" action="#{cadastroPedidoBean.removeDaListaItens()}">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{cadastroPedidoBean.itemPedidoRemover}" />
+                        </p:commandButton>
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

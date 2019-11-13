@@ -1,0 +1,62 @@
+body{
+	margin: 0;
+	font-size: 90% !important;
+	font-family: Arial, Helvetica, sans-serif;
+	
+}
+
+header{
+	height: 45px;
+	background-color: #0388e5;
+	color: #fff;
+	box-shadow: 0px 2px 2px #ccc;
+	margin-bottom: 20px;
+	padding: 5px 0;
+}
+
+#conteudo{
+	padding: 0px 15px;
+}
+header > div {
+	
+	margin-left: 5px;
+	
+}
+
+.menu{
+	float: right;
+	padding-right: 15px;
+}
+
+.logo{
+	
+	float:left;
+        font-size:30px; margin-left:45%;
+        font-family:garamond,arial,helvetica;
+        font-weight: bold
+}
+
+.menubar{
+	background: none;
+	border: 0;
+	padding: 0;
+	padding-top: 6px !important;
+	
+}
+
+menubar ui-menu-parent > a .ui-menuitem-text, .menubar > .ui-menu-list > .ui-menuitem > a > .ui-menuitem-text {
+	color: #fff;
+	font-size: 16px;
+}
+
+.usuario-logado{
+	float: left;
+	line-height: 45px;	
+	font-size: 16px;
+	margin-right: 35px;
+}
+
+.menu > form{
+	display: inline-block;
+}
+

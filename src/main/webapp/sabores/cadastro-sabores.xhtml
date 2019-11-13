@@ -1,0 +1,49 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+    <ui:define name="corpo">
+
+        <body  background="#{resource['imagens:color.jpg']}" >
+            <h1>Cadastro de Sabores</h1>
+            <p:messages closable="true" showDetail="true" showSummary="false">
+                <p:autoUpdate />
+            </p:messages>              
+            <meta charset="utf-8"/>
+            <h:form id="formulario">
+                <f:metadata>
+                    <o:viewParam name="sabor"  value="#{cadastroSaboresBean.sabores}" />
+                    <f:viewAction action="#{cadastroSaboresBean.inicializar}" />
+                </f:metadata>
+                <p:toolbar style="margin-bottom:20px">
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/sabores/cadastro-sabores" />
+                        <p:commandButton value="Salvar" update="formulario" action="#{cadastroSaboresBean.salvar}"/>
+                    </f:facet>
+                    <f:facet name="right">
+                        <p:button value="Pesquisar" outcome="/sabores/pesquisa-sabores"  />
+                    </f:facet>
+                </p:toolbar>
+                <p:panelGrid columns="2">
+                    <p:outputLabel value="Nome"  />
+                    <p:inputText value="#{cadastroSaboresBean.sabores.nome}" required="true" requiredMessage="Nome obrigatório" style="width:95%" />
+
+                    <p:outputLabel value="Descrição"/>
+                    <p:inputText value="#{cadastroSaboresBean.sabores.descricao}"  style="width:95%" />
+
+                    <p:outputLabel for="comboBox" value="Categoria"  />
+                    <p:selectOneMenu id="comboBox" value="#{cadastroSaboresBean.sabores.categoria}" style="width:80%" required="true" requiredMessage="Selecione uma categoria"
+                                     >
+                        <f:selectItem itemLabel="Selecione uma categoria" itemValue="0" noSelectionOption="true" />
+                        <f:selectItems value="#{cadastroSaboresBean.categorias}" var="c" itemLabel="#{c.nome}" itemValue="#{c}" />
+                    </p:selectOneMenu>
+                </p:panelGrid>
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

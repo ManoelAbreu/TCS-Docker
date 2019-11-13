@@ -1,0 +1,53 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui"
+                >
+
+
+    <ui:define name="corpo">
+        <h1>Cadastro de Borda</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+
+
+        <body id="bodyGarcom" background="#{resource['imagens:color.jpg']}">
+            <h:form id="formulario">
+
+                <f:metadata>
+                    <o:viewParam name="borda"  value="#{cadastroBordaBean.borda}" />
+                    <f:viewAction action="#{cadastroBordaBean.inicializar}" />
+                </f:metadata>
+
+                <p:toolbar style="margin-bottom:20px">
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/borda/cadastro-borda" />
+                        <p:commandButton value="Salvar" action="#{cadastroBordaBean.salvar}" />
+
+                    </f:facet>
+
+                    <f:facet name="right">
+                        <p:button value="Pesquisar" outcome="/borda/pesquisa-borda"  />
+                    </f:facet>
+
+                </p:toolbar>
+
+                <p:panelGrid columns="2">
+
+                    <p:outputLabel value="Nome"  />
+                    <p:inputText value="#{cadastroBordaBean.borda.nome}" required="true" requiredMessage="Nome da borda obrigatorio" />
+
+                    <p:outputLabel value="Preço"  />
+                    <p:inputNumber symbol="R$ " value="#{cadastroBordaBean.borda.preco}" required="true" requiredMessage="Preço obrigatório"  />
+
+                </p:panelGrid>
+
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

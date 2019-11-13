@@ -1,0 +1,198 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <ui:define name="corpo">
+        <h1>Pedidos cozinha</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+            <meta charset="utf-8"/> 
+        <style type="text/css">
+            fieldset {margin-left:20px}
+        </style>
+
+            <body id="bodyGarcom" background="#{resource['imagens:color.jpg']}">
+            <h:form id="cozinhaForm">
+
+                <p:poll id="teste" interval="10" listener="#{PedidoCozinnhaBean.init()}" update="@this"/>
+                <div style = "float: left; width:30%;margin-left:50px;">
+
+                    <p:fieldset id="novosPedido" legend="Novos pedidos">
+                        <h:outputText value="Pedido novos entrão aqui"
+                                      rendered="#{empty PedidoCozinnhaBean.pedidos}" style="font-size:24px;" />
+
+                        <p:dataTable id="novosPedidoTabela" var="pedido"
+                                     value="#{PedidoCozinnhaBean.pedidos}"
+                                     rendered="#{not empty PedidoCozinnhaBean.pedidos}">    
+
+                            <p:column headerText="Cliente" style="text-align: center">
+                                <h:outputText value="#{pedido.nomeCliente}" />
+
+                                <p:dataTable id="todasPessoasTabela" var="itemPedido"
+                                             value="#{pedido.itemPedido}">
+
+                                    <p:column headerText="Produto">
+                                        <h:outputText value="#{itemPedido.produto.nome}" rendered="#{itemPedido.produto.itemCozinha}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Qtd" style = "width: 40px; text-align: center">
+                                        <h:outputText value="#{itemPedido.quantidade}"  rendered="#{itemPedido.produto.itemCozinha}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p:column>
+
+                            <p:column headerText="Mesa" style = "width: 35px; text-align: center">
+                                <h:outputText value="#{pedido.mesa.numero}" />
+                            </p:column>
+
+                            <p:column headerText="Detalhes" style = "width:55px; text-align: center" >
+                                <p:commandButton id="detalhes" icon="ui-icon-comment" oncomplete="PF('detalhes').show();" update="cozinhaForm:detalhes cozinhaForm:teste"  
+                                                 disabled="#{PedidoCozinnhaBean.validaObservacoes(pedido)}">
+                                    <f:setPropertyActionListener value="#{pedido}"
+                                                                 target="#{PedidoCozinnhaBean.pedido}" />
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column headerText="Próximo" style = "width:55px; text-align: center" >
+                                <p:commandButton id="próximoFin" value="➥" action="#{PedidoCozinnhaBean.proximoParaPrep}" update="cozinhaForm"
+                                                 style="width:40px; height: 100px">
+                                    <f:setPropertyActionListener value="#{pedido}"
+                                                                 target="#{PedidoCozinnhaBean.pedido}" />                                    
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:fieldset>
+                </div>  
+
+                <div style = "float: left; width:30%">
+                    <p:fieldset id="pedidosPreparo" legend="Em preparo">
+
+                        <p:outputPanel id="dropArea">
+                            <h:outputText value="Clique no botão próximo para jogar para cá"
+                                          rendered="#{empty PedidoCozinnhaBean.pedidosPreparo}" style="font-size:24px;" />
+
+                            <p:dataTable id="pedidosPreparoTabela" var="pedido"
+                                         value="#{PedidoCozinnhaBean.pedidosPreparo}"
+                                         rendered="#{not empty PedidoCozinnhaBean.pedidosPreparo}">
+
+                                <p:column headerText="Cliente" style="text-align: center">
+                                    <h:outputText value="#{pedido.nomeCliente}"/>
+
+                                    <p:dataTable id="todasPessoasTabela" var="itemPedido"
+                                                 value="#{pedido.itemPedido}">
+
+                                        <p:column headerText="Produto">
+                                            <h:outputText value="#{itemPedido.produto.nome}" rendered="#{itemPedido.produto.itemCozinha}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Qtd" style = "width: 40px; text-align: center">
+                                            <h:outputText value="#{itemPedido.quantidade}" rendered="#{itemPedido.produto.itemCozinha}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+                                </p:column>
+
+                                <p:column headerText="Mesa" style = "width: 35px; text-align: center">
+                                    <h:outputText value="#{pedido.mesa.numero}" />
+                                </p:column>
+
+                                <p:column headerText="Detalhes" style = "width:55px; text-align: center" >
+                                    <p:commandButton id="detalhes" icon="ui-icon-comment" oncomplete="PF('detalhes').show();" update="cozinhaForm:detalhes" disabled="#{PedidoCozinnhaBean.validaObservacoes(pedido)}">
+                                        <f:setPropertyActionListener value="#{pedido}"
+                                                                     target="#{PedidoCozinnhaBean.pedido}" />
+                                    </p:commandButton>
+                                </p:column>
+
+                                <p:column headerText="Próximo" style = "width:55px; text-align: center" >
+                                    <p:commandButton id="próximoFin" value="➥" action="#{PedidoCozinnhaBean.proximoParaFin()}" update="cozinhaForm"
+                                                     style="width:40px; height: 100px">
+                                        <f:setPropertyActionListener value="#{pedido}"
+                                                                     target="#{PedidoCozinnhaBean.pedido}" />
+                                    </p:commandButton>
+                                </p:column>
+
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </p:fieldset>
+                </div>
+
+
+                <div style = "float: left; width:30%">
+                    <p:fieldset id="pedidosFinalizados" legend="Pedido Finalizado">
+                        <p:outputPanel id="dropArea2">
+                            <h:outputText value="Clique no botão próximo para jogar para cá"
+                                          rendered="#{empty PedidoCozinnhaBean.pedidosFinalizados}" style="font-size:24px;" />
+                            <p:dataTable id="pedidosFinalizadosTabela" var="pedido"
+                                         value="#{PedidoCozinnhaBean.pedidosFinalizados}"                                
+                                         rendered="#{not empty PedidoCozinnhaBean.pedidosFinalizados}">
+
+                                <p:column headerText="Cliente" style="text-align: center">
+                                    <h:outputText value="#{pedido.nomeCliente}"/>
+
+                                    <p:dataTable id="todasPessoasTabela" var="itemPedido"
+                                                 value="#{pedido.itemPedido}">
+
+                                        <p:column headerText="Produto">
+                                            <h:outputText value="#{itemPedido.produto.nome}" rendered="#{itemPedido.produto.itemCozinha}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Qtd" style = "width: 40px; text-align: center">
+                                            <h:outputText value="#{itemPedido.quantidade}" rendered="#{itemPedido.produto.itemCozinha}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+                                </p:column>
+
+                                <p:column headerText="Mesa" style = "width: 35px; text-align: center">
+                                    <h:outputText value="#{pedido.mesa.numero}" />
+                                </p:column>
+
+                                <p:column headerText="Detalhes" style = "width:55px; text-align: center" >
+                                    <p:commandButton id="detalhes" icon="ui-icon-comment" oncomplete="PF('detalhes').show();" update="cozinhaForm:detalhes" disabled="#{PedidoCozinnhaBean.validaObservacoes(pedido)}">
+                                        <f:setPropertyActionListener value="#{pedido}"
+                                                                     target="#{PedidoCozinnhaBean.pedido}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </p:fieldset>
+                </div>  
+                <p:dialog header="Datalhes dos produtos" showEffect="fade"
+                          hideEffect="fade"
+                          widgetVar="detalhes" modal="true" position="center"> 
+                    <p:fieldset legend="Observacões">
+                        <p:dataTable value="#{PedidoCozinnhaBean.pedido.itemPedido}" var="itens"  id="detalhes" rows="5" paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15,25,50" paginatorPosition="bottom"
+                                     currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                                     emptyMessage="Nenhum registro encontrado">
+
+                            <p:column headerText="Produto" style = "width:20%; text-align: center">
+                                <h:outputText value="#{itens.produto.nome}"  rendered="#{itens.produto.itemCozinha}"/>
+                            </p:column>
+
+                            <p:column headerText="Observacão" resizable="enable">
+                                <p:outputLabel value="#{itens.observacao}"  rendered="#{itens.produto.itemCozinha}"/>
+                            </p:column>
+                            <p:column headerText="Sabores" style = "width:20%; text-align: center">
+                                <h:outputText value="#{PedidoCozinnhaBean.concatSabores(itens)}"  rendered="#{itens.produto.itemCozinha}"/>
+                            </p:column>
+                            <p:column headerText="Borda" style = "width:14%; text-align: center">
+                                <h:outputText value="#{itens.borda.nome}"  rendered="#{itens.produto.itemCozinha}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:dialog>
+            </h:form>
+        </body>
+
+    </ui:define>
+</ui:composition>

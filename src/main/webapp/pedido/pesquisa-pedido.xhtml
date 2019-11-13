@@ -1,0 +1,214 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <meta charset="utf-8"/>
+    <ui:define name="corpo">
+
+        <body  background="#{resource['imagens:color.jpg']}" >
+            <h1>Pesquisa de pedidos</h1>
+
+            <p:messages closable="true" showDetail="true" showSummary="false">
+                <p:autoUpdate />
+            </p:messages>
+
+            <f:metadata>
+                <f:viewAction action="#{pesquisaPedidoBean.inicializar()}" />
+            </f:metadata>
+
+            <h:form id="pesquisaPedidos">
+
+                <p:toolbar style="margin-bottom:20px">                 
+                    <f:facet name="right">
+                        <p:commandButton value="Limpa filtros" update="tabela" action="#{pesquisaPedidoBean.limpaFiltros()}"/>
+                    </f:facet>
+
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/pedido/cadastro-pedido" />
+                    </f:facet>
+
+                </p:toolbar>
+
+                <p:panelGrid columns="4">
+                    <p:outputLabel value="Mesa"/>
+                    <p:selectOneMenu id="mesa" style="width:210px"  value="#{pesquisaPedidoBean.pedidoQuery.mesa}">
+                        <f:selectItem itemLabel="Selecione uma mesa" noSelectionOption="true" itemValue="#{null}" value="#{null}"/>
+                        <f:selectItems value="#{pesquisaPedidoBean.mesas}" var="mesa"
+                                       itemLabel="#{mesa.numero} - #{mesa.ocupacao.descricao}" itemValue="#{mesa}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="Nome do cliente" />
+                    <p:inputText value="#{pesquisaPedidoBean.pedidoQuery.nomeCliente}"/>
+
+                    <p:outputLabel value="Status da pagamento" />
+                    <p:selectOneMenu id="pagamento" style="width:210px"  value="#{pesquisaPedidoBean.pedidoQuery.statusPedido}">
+                        <f:selectItem itemLabel="Selecione um status" noSelectionOption="true" itemValue="#{null}" value="#{null}"/>
+                        <f:selectItems value="#{pesquisaPedidoBean.statusPedidos}" var="pedidoPagamento"
+                                       itemLabel="#{pedidoPagamento.descricao}" itemValue="#{pedidoPagamento}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Status do preparo" />
+                    <p:selectOneMenu id="preparo" style="width:210px"  value="#{pesquisaPedidoBean.pedidoQuery.statusPreparo}">
+                        <f:selectItem itemLabel="Selecione um status" noSelectionOption="true" itemValue="#{null}" value="#{null}"/>
+                        <f:selectItems value="#{pesquisaPedidoBean.statusPreparos}" var="pedidoPreparo"
+                                       itemLabel="#{pedidoPreparo.descricao}" itemValue="#{pedidoPreparo}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Data do pedido" />
+                    <p:inputMask id="time" value="#{pesquisaPedidoBean.pedidoQuery.dataPedido}" mask="99/99/9999">
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                    </p:inputMask>
+
+                </p:panelGrid>
+                <p:commandButton value="Pesquisar" update="tabela" style="margin-bottom: 20px;margin-top:10px " action="#{pesquisaPedidoBean.pesquisar()}"/>
+
+                <p:dataTable id="tabela" value="#{pesquisaPedidoBean.pedidos}"
+                             var="pedido" rows="10" paginator="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,30,40" paginatorPosition="bottom"
+                             currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                             emptyMessage="Nenhum registro encontrado">
+
+                    <p:column headerText="Número da mesa" style="text-align:center; width:5%">
+                        <h:outputLabel value="#{pedido.mesa.numero}"/>
+                    </p:column>
+
+                    <p:column headerText="Nome do cliente" style="text-align:center">
+                        <h:outputLabel value="#{pedido.nomeCliente}" />
+                    </p:column>
+
+                    <p:column headerText="Status do preparo" style="text-align:center; width:15%">
+                        <h:outputLabel value="#{pedido.statusPreparo.descricao}" />
+                    </p:column>
+
+                    <p:column headerText="Status do pagamento" style="text-align:center; width:10%">
+                        <h:outputLabel value="#{pedido.statusPedido.descricao}" />
+                    </p:column>
+
+                    <p:column headerText="Data do pedido" style="text-align:center; width:10%">
+                        <h:outputLabel value="#{pedido.dataPedido}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputLabel>
+                    </p:column>
+
+
+                    <p:column headerText="Valor do pedido" style="text-align:center; width:10%">
+                        <h:outputLabel value="#{pedido.totalPedido}">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputLabel>
+                    </p:column>
+
+                    <p:column style="width:5%">
+
+                        <h:outputLabel>
+                            <p:commandButton value="Detalhes" title="detalhes"
+                                             oncomplete="PF('detalhes').show();" update="pesquisaPedidos:detalhes">
+                                <f:setPropertyActionListener target="#{pesquisaPedidoBean.pedidoSelecionado}" value="#{pedido}"/>
+                            </p:commandButton>
+
+                        </h:outputLabel>
+
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:dialog header="Visualização de pedido" showEffect="fade"
+                          hideEffect="fade"
+                          widgetVar="detalhes" id="detalhes" modal="true">
+
+                    <h:panelGrid columns="4" width="40%" style="border:1px solid black;float: left; margin-right:20px" cellspacing="6">
+                        <h:outputLabel value="Número da mesa:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.mesa.numero}"/>
+
+                        <h:outputLabel value="Nome do cliente:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.nomeCliente}" />
+
+                        <h:outputLabel value="Status do preparo:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.statusPreparo.descricao}" />
+
+                        <h:outputLabel value="Status do pedido:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.statusPedido.descricao}" />
+
+                        <h:outputLabel value="Data do pedido:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.dataPedido}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputLabel>
+
+                        <h:outputLabel value="Valor total do pedido:" style="font-weight: bold"/>
+                        <h:outputLabel value="#{pesquisaPedidoBean.pedidoSelecionado.totalPedido}">
+                            <f:convertNumber pattern="R$ #0.00"/>
+                        </h:outputLabel>
+                    </h:panelGrid>
+
+                    <p:fieldset  legend="Observações do Item #{pesquisaPedidoBean.pegaNumeroItem(pesquisaPedidoBean.item)==0?'':pesquisaPedidoBean.pegaNumeroItem(pesquisaPedidoBean.item)}"
+                                 title="Observações Item"  id="observacoes"  style="float:left; width:30%" >
+                        <h:outputText value="Observação dos item serão exibidas aqui ao clicar em detalhes"
+                                      rendered="#{empty pesquisaPedidoBean.item}" style="font-size:15px;" />
+
+                        <h:outputText value="#{pesquisaPedidoBean.item.observacao}" />
+                    </p:fieldset>
+
+
+                    <p:dataTable id="tabelaItens" value="#{pesquisaPedidoBean.pedidoSelecionado.itemPedido}"
+                                 var="item" rows="5" paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15,25,50" paginatorPosition="bottom"
+                                 currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                                 emptyMessage="Nenhum registro encontrado" style="margin-top: 150px; clear: both">
+
+                        <p:column headerText="Item" style="text-align:center; width:2%;">
+                            <h:outputLabel value="#{pesquisaPedidoBean.pegaNumeroItem(item)}"/>
+                        </p:column>
+
+                        <p:column headerText="Nome" style="text-align:center; width:15%;">
+                            <h:outputLabel value="#{item.produto.nome}"/>
+                        </p:column>
+
+                        <p:column headerText="Valor unitário" style="text-align:center; width:7%;">
+                            <h:outputLabel value="#{item.produto.valor}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column headerText="Quantidade" style="width:5%;text-align: center">
+                            <h:outputLabel value="#{item.quantidade}"/>
+                        </p:column>
+
+                        <p:column headerText="Total do item" style="text-align:center; width:10%;">
+                            <h:outputLabel value="#{item.quantidade*item.produto.valor+item.borda.preco}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column headerText="Sabores" style="text-align: center">
+                            <h:outputLabel  value="#{pesquisaPedidoBean.concatSabores(item)}"/>
+                        </p:column>
+
+                        <p:column headerText="Borda" style="width:10%;text-align: center">
+                            <h:outputLabel  value="#{item.borda.nome}"/>
+                        </p:column>
+
+                        <p:column headerText="Preço da borda" style="width:10%;text-align: center">
+                            <h:outputLabel  value="#{item.borda.preco}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column headerText="Entrega" style="width:5%;text-align: center">
+                            <h:outputLabel  value="#{item.statusEntrega.descricao}"/>
+                        </p:column>
+
+                        <p:column headerText="Detalhes" style = "width:3%; text-align: center" >
+                            <p:commandButton id="detalhes2" icon="ui-icon-comment" update="pesquisaPedidos:observacoes"  disabled="#{pesquisaPedidoBean.validaObservacoes(item)}">
+                                <f:setPropertyActionListener value="#{item}"
+                                                             target="#{pesquisaPedidoBean.item}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

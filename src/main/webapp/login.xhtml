@@ -1,0 +1,32 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </h:head>
+
+    <body id="bodyGarcom" background="#{resource['imagens:color.jpg']}">
+        <h:form>
+            <p:messages  closable="true" showDetail="true" showSummary="false" >
+                <p:autoUpdate />
+            </p:messages>
+            <p:dialog header="Login"  resizable="false" visible="true" closable="false" draggable="false">
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel for="login" value="Login" />
+                    <p:inputText id="login" value="#{loginBean.login}" 
+                                 required="true" requiredMessage="O campo login deve ser informado" />
+
+                    <h:outputLabel for="senha" value="Senha" />
+                    <p:password id="senha" value="#{loginBean.senha}"
+                                required="true" requiredMessage="A senha deve ser informada" />
+                    <f:facet name="footer">
+                        <p:commandButton value="Login" action="#{loginBean.efetuarLogin}" />
+                    </f:facet>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+        </body>
+</html>

@@ -1,0 +1,107 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <meta charset="utf-8"/>
+    <ui:define name="corpo">
+
+        <h1>Pesquisa de mesa</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+        <body id="bodyGarcom" background="#{resource['imagens:color.jpg']}">
+            <h:form>
+
+                <f:metadata>
+                    <f:viewAction action="#{pesquisaMesaBean.inicializar()}" />
+                </f:metadata>
+                <p:toolbar style="margin-bottom:20px">                    
+                    <f:facet name="right">
+                        <p:commandButton value="Lista mesas desativadas"  action="#{pesquisaMesaBean.listaDesativados()}" update="tabela"/>
+                    </f:facet>
+
+                    <f:facet name="right">
+                        <p:commandButton value="Limpa filtros"  action="#{pesquisaMesaBean.inicializar()}" update="tabela"/>
+                    </f:facet>
+
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/mesa/cadastro-mesa" />
+                    </f:facet>
+
+                </p:toolbar>
+
+                <p:panelGrid columns="3" style="margin-bottom: 20px">
+                    <p:outputLabel value="Pesquisa por número" />
+                    <p:inputNumber decimalPlaces="0" value="#{pesquisaMesaBean.mesaSelecionada.numero}">
+                    </p:inputNumber>
+                    <p:commandButton value="Pesquisar" update="tabela" action="#{pesquisaMesaBean.pesquisarNumero()}"/>
+                </p:panelGrid>
+
+                <p:dataTable id="tabela" value="#{pesquisaMesaBean.mesas}"
+                             var="mesa" rows="10" paginator="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25,50" paginatorPosition="bottom"
+                             currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                             emptyMessage="Nenhum registro encontrado">
+
+                    <p:column headerText="Número" style="text-align:center" width="10%">
+                        <h:outputLabel value="#{mesa.numero}" />
+                    </p:column>
+
+                    <p:column headerText="Descrição" style="text-align:center">
+                        <h:outputLabel value="#{mesa.descricao}" />
+                    </p:column>
+
+                    <p:column headerText="Situação atual da mesa" style="text-align:center;width:10%">
+                        <h:outputLabel value="#{mesa.ocupacao.descricao}" />
+                    </p:column>
+
+                    <p:column headerText="Qr Code" style="text-align:center">
+                        <h:outputLabel value="#{mesa.qrCode}" />
+                    </p:column>
+
+                    <p:column headerText="Ativo" style="text-align:center;width:5%" >
+                        <p:selectBooleanCheckbox value="#{mesa.situacao}" disabled="true" />
+                    </p:column>
+
+                    <p:column style="width:80px">
+
+                        <h:outputLabel>
+                            <p:button icon="ui-icon-pencil" title="editar"
+                                      outcome="/mesa/cadastro-mesa">
+                                <f:param name="mesa" value="#{mesa.id}" />
+                            </p:button>
+
+                            <p:commandButton icon="ui-icon-trash" title="excluir"
+                                             oncomplete="PF('confirmacaoExclusao').show();" disabled="#{mesa.situacao != true}">
+                                <f:setPropertyActionListener value="#{mesa}"
+                                                             target="#{pesquisaMesaBean.mesaExlusao}" />
+                            </p:commandButton>
+
+                        </h:outputLabel>
+
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:confirmDialog header="Exclusão de mesa" showEffect="fade"
+                                 hideEffect="fade"
+                                 message="Tem certeza que deseja excluir essa mesa?"
+                                 widgetVar="confirmacaoExclusao">
+
+                    <p:commandButton value="Sim" icon="ui-icon-check" iconPos="right"
+                                     action="#{pesquisaMesaBean.excluir}" update="tabela"
+                                     oncomplete="PF('confirmacaoExclusao').hide(); return false;" />
+
+                    <p:button value="Não"
+                              onclick="PF('confirmacaoExclusao').hide(); return false;"
+                              icon="ui-icon-close" iconPos="right" />
+                </p:confirmDialog>
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

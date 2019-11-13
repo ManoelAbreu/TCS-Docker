@@ -1,0 +1,96 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+    <ui:define name="corpo">
+        <h1>Pesquisa de Sabores</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+
+        <meta charset="utf-8"/> 
+        <body  background="#{resource['imagens:color.jpg']}" >
+            <h:form id="formulario">
+
+                <f:metadata>
+                    <f:viewAction action="#{pesquisaSaboresBean.inicializar}" />
+                </f:metadata>
+
+                <p:toolbar style="margin-bottom:20px">
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/sabores/cadastro-sabores" />
+
+                    </f:facet>
+
+                    <f:facet name="right">
+                        <p:commandButton action="#{pesquisaSaboresBean.pesquisar}" update="tabela" value="Pesquisar" />
+                    </f:facet>
+
+                </p:toolbar>
+
+                <p:panelGrid columns="2"  style="margin-bottom:20px">
+                    <p:outputLabel value="Pesquisa por nome"/>
+                    <p:inputText value="#{pesquisaSaboresBean.nome}"  />
+                </p:panelGrid>
+
+                <p:dataTable id="tabela" value="#{pesquisaSaboresBean.listaSabores}"
+                             var="sabor" rows="10" paginator="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25,50" paginatorPosition="bottom"
+                             currentPageReportTemplate=" Página {currentPage} de {totalPages}"
+                             emptyMessage="Nenhum registro encontrado">
+
+                    <p:column headerText="Código" style="text-align:center;width:80px">
+                        <h:outputLabel value="#{sabor.id}" />
+                    </p:column>
+
+                    <p:column headerText="Nome">
+                        <h:outputLabel value="#{sabor.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Descrição">
+                        <h:outputLabel value="#{sabor.descricao}" />
+                    </p:column>
+
+                    <p:column style="width:80px">
+                        <h:outputLabel>
+                            <p:button icon="ui-icon-pencil" title="editar"
+                                      outcome="/sabores/cadastro-sabores">
+                                <f:param name="sabor" value="#{sabor.id}" />
+                            </p:button>
+
+                            <p:commandButton icon="ui-icon-trash" title="excluir"
+                                             oncomplete="PF('confirmacaoExclusao').show();">
+                                <f:setPropertyActionListener value="#{sabor}"
+                                                             target="#{pesquisaSaboresBean.sabores}" />
+                            </p:commandButton>
+
+                        </h:outputLabel>
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:confirmDialog header="Exclusão de sabores" showEffect="fade"
+                                 hideEffect="fade"
+                                 message="Tem certeza que deseja excluir esse sabor ?"
+                                 widgetVar="confirmacaoExclusao">
+
+                    <p:commandButton value="Sim" icon="ui-icon-check" iconPos="right"
+                                     action="#{pesquisaSaboresBean.excluir}" update="tabela"
+                                     oncomplete="PF('confirmacaoExclusao').hide(); return false;" />
+
+                    <p:button value="Não"
+                              onclick="PF('confirmacaoExclusao').hide(); return false;"
+                              icon="ui-icon-close" iconPos="right" />
+                </p:confirmDialog>
+
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

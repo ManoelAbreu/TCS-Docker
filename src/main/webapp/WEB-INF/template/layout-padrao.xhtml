@@ -1,0 +1,95 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link type="image/x-icon" rel="shortcut icon" href="#{resource['imagens:favicon.ico']}" />
+        <h:outputStylesheet library="css" name="sistema.css" />
+        <title>ComUp</title>
+    </h:head>
+
+    <h:body>
+
+        <header>
+            <div class="logo">
+                <strong>ComUP</strong>
+                <h:graphicImage id="imagem" library="imagens" name="#{templateBean.retornaImagem()}" width="45" height="45"/>
+            </div>
+            <div class="menu">
+
+                <SPAN class="usuario-logado">Olá #{templateBean.usuario.nome}</SPAN>
+                <h:form>
+                    <p:menubar styleClass="menubar" rendered="#{templateBean.verificaPerfilGerente()}">                       
+
+                        <p:submenu label="Pedido">
+                            <p:menuitem value="Emitir pedido" outcome="/pedido/cadastro-pedido" />
+                            <p:menuitem value="Pesquisar pedido" outcome="/pedido/pesquisa-pedido"/>
+                        </p:submenu>
+                        <p:submenu label="Cadastros">
+                            <p:menuitem value="Categorias" outcome="/categoria/cadastro-categoria" />
+                            <p:menuitem value="Mesas" outcome="/mesa/cadastro-mesa"/>
+                            <p:menuitem value="Sabores" outcome="/sabores/cadastro-sabores"/>
+                            <p:menuitem value="Produtos" outcome="/produto/cadastro-produto"/>
+                            <p:menuitem value="Usuários" outcome="/usuario/cadastro-usuario" />
+                            <p:menuitem value="Bordas" outcome="/borda/cadastro-borda" />
+                        </p:submenu>
+                        <p:submenu label="Pesquisas">
+                            <p:menuitem value="Categorias" outcome="/categoria/pesquisa-categoria" />
+                            <p:menuitem value="Mesas" outcome="/mesa/pesquisa-mesa"/>
+                            <p:menuitem value="Sabores" outcome="/sabores/pesquisa-sabores"/>
+                            <p:menuitem value="Produtos" outcome="/produto/pesquisa-produto"/>
+                            <p:menuitem value="Usuários" outcome="/usuario/pesquisa-usuario" />
+                            <p:menuitem value="Borda" outcome="/borda/pesquisa-borda" />
+                        </p:submenu>
+
+                        <p:menuitem value="Sair" action="#{loginBean.logout()}"/>
+                    </p:menubar>                    
+                </h:form>
+
+                <h:form>
+                    <p:menubar styleClass="menubar"  rendered="#{templateBean.verificaPerfilGarcom()}">
+                        <p:submenu label="Pedido">
+                            <p:menuitem value="Emitir pedido" outcome="/pedido/cadastro-pedido" />
+                            <p:menuitem value="Pesquisar pedido" outcome="/pedido/pesquisa-pedido"/>
+                        </p:submenu>
+                        <p:submenu label="Garçom">
+                            <p:menuitem value="Gerenciar pedidos" outcome="/garcom/pedido-garcom" />
+                        </p:submenu>
+                       <p:menuitem value="Sair" action="#{loginBean.logout()}"/>
+                    </p:menubar>
+                </h:form>
+
+
+                <h:form>               
+                    <p:menubar styleClass="menubar" rendered="#{templateBean.verificaPerfilCozinha()}">    
+                        <p:menuitem value="Sair" action="#{loginBean.logout()}"/>
+                    </p:menubar>
+                </h:form>
+
+                <h:form>
+                    <p:menubar styleClass="menubar" rendered="#{templateBean.verificaPerfilCaixa()}">   
+                        <p:submenu label="Pedido">
+                            <p:menuitem value="Pesquisar pedido" outcome="/pedido/pesquisa-pedido"/>
+                        </p:submenu>
+                        <p:submenu label="Mesas">
+                            <p:menuitem value="Cadastro de mesas" outcome="/mesa/cadastro-mesa"/>
+                            <p:menuitem value="Pesquisa de mesas" outcome="/mesa/pesquisa-mesa"/>
+                        </p:submenu>
+                        <p:submenu label="Caixa">
+                            <p:menuitem value="Gerencia pedidos" outcome="/caixa/caixa-pedido"/>                     
+                        </p:submenu>
+                        <p:menuitem value="Sair" action="#{loginBean.logout()}"/>
+                    </p:menubar>
+                </h:form>
+
+            </div>
+        </header>
+        <div id="conteudo">
+            <ui:insert name="corpo" />
+        </div>
+
+    </h:body>
+</html>

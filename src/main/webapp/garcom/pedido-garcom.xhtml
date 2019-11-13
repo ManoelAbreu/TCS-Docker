@@ -1,0 +1,114 @@
+    <ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+    <ui:define name="corpo">
+        <h1>Pedidos garçom</h1>
+
+        <p:messages  closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+            <meta charset="utf-8"/> 
+
+        <body id="bodyGarcom" background="#{resource['imagens:color.jpg']}">
+
+            <style type="text/css">
+                .value {
+                    font-weight: bold;
+                }
+            </style>
+
+
+            <h:form id="garcomForm">
+                <p:poll id="teste" interval="10" listener="#{cadastroBordaBean.inicializar()}" update="garcomForm"/>
+                <p:dataGrid id="dataGrid" var="mesa" value="#{pedidoGarcomBean.mesasEmUso}" columns="4" layout="grid">
+
+                    <f:facet name="header">
+                        Mesas em ocupação
+                    </f:facet>
+
+                    <p:panel id="panelMesa" header="Mesa - #{mesa.numero}" style="text-align:center">
+
+                        <h:panelGrid id="gridImg" columns="1" style="width:100%">  
+                            <p:commandLink  oncomplete="PF('detalhes').show();" title="Menu" action="#{pedidoGarcomBean.buscaPedidosMesa()}" update="pedidosForm:tabelaItens pedidosForm:garcom pedidosForm:commandGarcom">
+                                <f:setPropertyActionListener value="#{mesa}"
+                                                             target="#{pedidoGarcomBean.mesaSelecionada}"/>
+                                <div style="float: left">
+                                    <h:outputText value="Cliente: #{mesa.nomeCliente}" />
+                                    <br/>
+                                    <h:outputText id="outputGarcom" value="Garçom: #{mesa.garcom.nome!=null?mesa.garcom.nome:''}" />
+                                </div>                             
+                                <h:graphicImage id="imagem" library="imagens" name="#{pedidoGarcomBean.verificaNovosPedidos(mesa)?'dinnerAviso.png':'dinner.png'}" width="110" height="110" style="margin-right:10%;float:right"/>
+                            </p:commandLink>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:dataGrid>
+            </h:form>
+            <h:form id="pedidosForm">
+
+                <p:dialog header="Pedidos" showEffect="fade"
+                          hideEffect="fade"
+                          widgetVar="detalhes"  position="center" onHide=""> 
+                    
+                    <p:ajax event="close" update="garcomForm" />
+                    <p:panelGrid columns="2" style="margin-bottom:10px">
+                        <p:outputLabel value="Garçom responsável pela mesa" style="font-weight:bold"/>
+                        <p:selectOneMenu id="garcom" value="#{pedidoGarcomBean.mesaSelecionada.garcom}" disabled="#{pedidoGarcomBean.mesaSelecionada.garcom!=null}">
+                            <f:selectItem itemLabel="Selecione um garçom" noSelectionOption="true" itemValue="#{null}" value="#{null}"/>
+                            <f:selectItems value="#{pedidoGarcomBean.garcons}" var="garcom"
+                                           itemLabel="#{garcom.nome}" itemValue="#{garcom}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton id="commandGarcom" value="Inserir" action="#{pedidoGarcomBean.salvarGarcom()}" update="garcom commandGarcom garcomForm:dataGrid" style="margin-bottom:10px" disabled="#{pedidoGarcomBean.mesaSelecionada.garcom!=null}"/>
+
+                    <p:dataTable var="pedido" value="#{pedidoGarcomBean.pedidosMesaSelecionada}" id="tabelaItens">
+                        <f:facet name="header">
+                            Clique para ver os itens do pedido
+                        </f:facet>
+                        <p:column style="width:16px">
+                            <p:rowToggler />
+                        </p:column>
+                        <p:column headerText="Nome cliente" style="font-weight: bold;text-align: center">
+                            <h:outputText value="#{pedido.nomeCliente}" />
+                        </p:column>
+                        <p:column headerText="Data do pedido" style="font-weight: bold;text-align: center">
+                            <h:outputText value="#{pedido.dataPedido}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:rowExpansion>
+                            <p:dataTable var="itenPedido" value="#{pedido.itemPedido}" id="tableItens">
+                                <p:column headerText="Item pedido" style="width: 20%;text-align: center">
+                                    <h:outputText value="#{itenPedido.produto.nome}" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}"/>
+                                </p:column>
+                                <p:column headerText="Quantidade" style="width:5%;text-align: center">
+                                    <h:outputText value="#{itenPedido.quantidade}" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}" />
+                                </p:column>
+                                <p:column headerText="Borda" style="text-align: center;width:15%">
+                                    <h:outputText value="#{itenPedido.borda.nome}" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}" />
+                                </p:column>
+                                <p:column headerText="Sabores" style="text-align: center;width:20%">
+                                    <h:outputText value="#{pedidoGarcomBean.concatSabores(itenPedido)}" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}" />
+                                </p:column>
+                                <p:column headerText="Observação" style="width: 33%">
+                                    <h:outputText value="#{itenPedido.observacao}" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}" />
+                                </p:column>
+                                <p:column headerText="Entregar" style="width:5%">
+                                    <p:commandButton value="#{pedidoGarcomBean.verificarEntrega(itenPedido)?'Entregue':'Entregar'}" disabled="#{pedidoGarcomBean.verificarEntrega(itenPedido)}" action="#{pedidoGarcomBean.entregaItem()}"
+                                                     update="tableItens" rendered="#{pedidoGarcomBean.validaRedenrizacao(pedido, itenPedido)}"  >
+                                        <f:setPropertyActionListener value="#{itenPedido}"
+                                                                     target="#{pedidoGarcomBean.itemPedidoEntregar}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </p:rowExpansion>
+                    </p:dataTable>
+                </p:dialog>
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

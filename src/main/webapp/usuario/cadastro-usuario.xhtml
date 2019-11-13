@@ -1,0 +1,70 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+    <ui:define name="corpo">
+        <h1>Cadastro de usuário</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+
+        <meta charset="utf-8"/> 
+        <body  background="#{resource['imagens:color.jpg']}" >
+            <h:form id="formulario">
+
+                <f:metadata>
+                    <o:viewParam name="usuario" value="#{cadastroUsuarioBean.usuario}"  />
+                    <f:viewAction action="#{cadastroUsuarioBean.inicializar}" />
+                </f:metadata>
+
+                <p:toolbar style="margin-bottom:20px">
+                    <f:facet name="left">
+                        <p:button value="Novo" outcome="/usuario/cadastro-usuario" />
+                        <p:commandButton value="Salvar" update="formulario" action="#{cadastroUsuarioBean.salvar}" />
+
+                    </f:facet>
+
+                    <f:facet name="right">
+                        <p:button value="Pesquisar" outcome="/usuario/pesquisa-usuario"/>
+                    </f:facet>
+                </p:toolbar>
+
+                <p:panelGrid columns="2">
+                    <p:outputLabel value="Nome"  />
+                    <p:inputText value="#{cadastroUsuarioBean.usuario.nome}" required="true" requiredMessage="Nome obrigatório" />
+
+                    <p:outputLabel value="Login" />
+                    <p:inputText value="#{cadastroUsuarioBean.usuario.login}" required="true" requiredMessage="Login obrigatório" />
+
+                    <p:outputLabel for="senha1" value="Senha" />
+                    <p:password value="#{cadastroUsuarioBean.usuario.senha}" id="senha1" 
+                                match="senha2" feedback="true" weakLabel="Fraca"
+                                strongLabel="Forte" goodLabel="Boa"
+                                required="true" requiredMessage="Senha obrigatório" validatorMessage="Ambas as senhas devem ser iguais!"/>
+
+                    <p:outputLabel for="senha2" value="Confirmação senha" />
+                    <p:password id="senha2" />
+
+                    <p:outputLabel for="comboBox" value="Perfil"  />
+                    <p:selectOneMenu id="comboBox" value="#{cadastroUsuarioBean.usuario.perfil}" style="width:125px" required="true" requiredMessage="Selecione um perfil"
+                                     >
+                        <f:selectItem itemLabel="Selecione um perfil" noSelectionOption="true" />
+                        <f:selectItems value="#{cadastroUsuarioBean.perfis}" var="c" itemLabel="#{c.descricao}" itemValue="#{c}" />
+                    </p:selectOneMenu>
+
+
+                    <p:outputLabel value="Ativo" />
+                    <p:selectBooleanCheckbox  value="#{cadastroUsuarioBean.usuario.ativo}"  />
+
+                </p:panelGrid>
+
+            </h:form>
+        </body>
+    </ui:define>
+</ui:composition>

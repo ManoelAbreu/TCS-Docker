@@ -1,0 +1,100 @@
+<ui:composition template="/WEB-INF/template/layout-padrao.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:o="http://omnifaces.org/ui"
+                >
+
+
+    <ui:define name="corpo">		
+        <h1>Caixa</h1>
+
+        <p:messages closable="true" showDetail="true" showSummary="false">
+            <p:autoUpdate />
+        </p:messages>
+
+        <body  background="#{resource['imagens:color.jpg']}" >
+        <h:form id="formulario">   
+
+            <h:form id="garcomForm">
+                <p:poll id="teste" interval="10" listener="#{caixaBean.init()}" update="@this"/>
+                <p:dataGrid id="dataGrid" var="mesa" value="#{caixaBean.mesasOcupadas}" columns="4" layout="grid">
+
+                    <f:facet name="header">
+                        Mesas em ocupação
+                    </f:facet>
+
+                    <p:panel  header="Mesa - #{mesa.numero}" style="text-align:center">
+
+                        <h:panelGrid id="gridImg" columns="2" style="width:55%" >  
+                            <h:outputText value="Cliente:"/>
+                            <h:outputLabel value=" #{mesa.nomeCliente}"/>
+                            <h:outputText value="Total da mesa:"/>
+                            <h:outputText value="#{caixaBean.totalMesa(mesa)}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputText>
+                            <h:outputText value="Garçom:" />
+                            <h:outputText value="#{mesa.garcom.nome!=null?mesa.garcom.nome:''}" />  
+                        </h:panelGrid>
+                        <p:commandButton style="margin-top:10px" oncomplete="PF('detalhes').show();" value="Visualizar itens" action="#{caixaBean.buscaPedidosMesa()}" update="formulario:pedidosForm:tableItens">
+                            <f:setPropertyActionListener value="#{mesa}"
+                                                         target="#{caixaBean.mesaSelecionada}"/>
+                        </p:commandButton>
+                        <p:commandButton style="margin-top:10px" oncomplete="PF('confirmaFinalizar').show();" value="Finalizar mesa">
+                            <f:setPropertyActionListener value="#{mesa}"
+                                                         target="#{caixaBean.mesaFinalizar}"/>
+                        </p:commandButton>
+                    </p:panel>
+                </p:dataGrid>
+
+                <p:confirmDialog header="Finalização de Mesa" showEffect="fade"
+                                 hideEffect="fade"
+                                 message="Tem certeza que deseja finalizar a mesa?"
+                                 widgetVar="confirmaFinalizar">
+
+                    <p:commandButton value="Sim" icon="ui-icon-check" iconPos="right"
+                                     action="#{caixaBean.finalizar}" update="formulario"
+                                     oncomplete="PF('confirmaFinalizar').hide(); return false;" />
+
+                    <p:button value="Não"
+                              onclick="PF('confirmaFinalizar').hide(); return false;"
+                              icon="ui-icon-close" iconPos="right" />
+                </p:confirmDialog>
+            </h:form>
+            <h:form id="pedidosForm">
+
+                <p:dialog header="Pedidos" showEffect="fade"
+                          hideEffect="fade"
+                          widgetVar="detalhes"  position="center">                   
+                    <p:dataTable var="itenPedido" value="#{caixaBean.todosItensMesa}" id="tableItens" scrollable="true" scrollHeight="300">
+                        <p:column headerText="Item" style="width: 20%;text-align: center">
+                            <h:outputText value="#{itenPedido.produto.nome}"/>
+                        </p:column>
+                        <p:column headerText="Quantidade" style="width:5%;text-align: center">
+                            <h:outputText value="#{itenPedido.quantidade}" />
+                        </p:column>
+                        <p:column headerText="Valor unitario" style="width:8%;text-align: center">
+                            <h:outputLabel value="#{itenPedido.valorUnitario}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column headerText="Valor total" style="width:8%;text-align: center">
+                            <h:outputLabel value="#{caixaBean.totalItem(itenPedido)}">
+                                <f:convertNumber pattern="R$ #0.00"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column headerText="Borda" style="text-align: center;width:15%">
+                            <h:outputText value="#{itenPedido.borda.nome}" />
+                        </p:column>
+                        <p:column headerText="Sabores" style="text-align: center;width:20%">
+                            <h:outputText value="#{pedidoGarcomBean.concatSabores(itenPedido)}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+            </h:form>
+        </h:form>
+</body>
+    </ui:define>
+</ui:composition>
