@@ -8,4 +8,13 @@ pipeline {
     options {
         skipStagesAfterUnstable()
     }
+    stages {
+        stage('Test') { 
+            steps {
+                sh 'mvn test' 
+            }
+           
+        }
+       
+    }
 }
